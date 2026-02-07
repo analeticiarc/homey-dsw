@@ -6,6 +6,8 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "USUARIO")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -27,6 +29,7 @@ public abstract class Usuario {
     @Column(name = "USERNAME", nullable = false, unique = true, length = 30)
     protected String username;
 
+    @JsonIgnore
     @Column(name = "SENHA", nullable = false, length = 255)
     protected String senha;
 
