@@ -1,10 +1,13 @@
 package br.edu.ifpe.recife.homey.service;
 
 import br.edu.ifpe.recife.homey.dto.AtualizarServicoDTO;
+import br.edu.ifpe.recife.homey.dto.CategoriaResponseDTO;
 import br.edu.ifpe.recife.homey.dto.CriarServicoDTO;
 import br.edu.ifpe.recife.homey.dto.AtualizarEnderecoDTO;
 import br.edu.ifpe.recife.homey.dto.EnderecoDTO;
+import br.edu.ifpe.recife.homey.dto.EnderecoResponseDTO;
 import br.edu.ifpe.recife.homey.dto.ServicoProximoDTO;
+import br.edu.ifpe.recife.homey.dto.ServicoResponseDTO;
 import br.edu.ifpe.recife.homey.dto.ViaCepResponse;
 import br.edu.ifpe.recife.homey.entity.Categoria;
 import br.edu.ifpe.recife.homey.entity.Coordenada;
@@ -48,19 +51,48 @@ public class ServicoService {
                 .toList();
     }
 
-    public List<ServicoProximoDTO> buscarPorCep(String cep) {
+    public List<Servico> listarPorCategoriaNome(String categoriaNome) {
+        if (categoriaNome == null) {
+            return List.of();
+        }
+        String nome = categoriaNome.trim();
+        if (nome.isEmpty()) {
+            return List.of();
+        }
+
+        return servicoRepository.findByCategorias_NomeIgnoreCase(nome);
+    }
+
+        public List<ServicoProximoDTO> buscarPorCep(String cep) {
+        return buscarPorCep(cep, null);
+        }
+
+        public List<ServicoProximoDTO> buscarPorCep(String cep, String categoriaNome) {
         // CEP do usuário → endereço textual
         ViaCepResponse viaCep = viaCepService.buscarEnderecoPorCep(cep);
         String enderecoUsuario =
-                viaCepService.montarEnderecoCompleto(viaCep);
+            viaCepService.montarEnderecoCompleto(viaCep);
 
         // Endereço → coordenadas do usuário
         Coordenada coordenadaUsuario =
-                nominatimService.obterCoordenadas(enderecoUsuario);
+            nominatimService.obterCoordenadas(enderecoUsuario);
 
         // Buscar serviços disponíveis
         List<Servico> servicos =
-                servicoRepository.findByDisponivelTrue();
+            servicoRepository.findByDisponivelTrue();
+
+        // Filtrar por categoria, se informado
+        if (categoriaNome != null) {
+            String nome = categoriaNome.trim();
+            if (!nome.isEmpty()) {
+            String nomeFinal = nome;
+            servicos = servicos.stream()
+                .filter(s -> s.getCategorias() != null &&
+                    s.getCategorias().stream()
+                        .anyMatch(c -> c.getNome() != null && c.getNome().equalsIgnoreCase(nomeFinal)))
+                .toList();
+            }
+        }
 
         // Calcular distância usando ENDERECO do serviço
         return servicos.stream()
@@ -86,6 +118,16 @@ public class ServicoService {
                             servico.getTitulo(),
                             servico.getDescricao(),
                             servico.getPrecoBase(),
+                            servico.getDisponivel(),
+                            servico.getPrestador().getId(),
+                            servico.getPrestador().getNome(),
+                            servico.getCategorias() != null ?
+                                    servico.getCategorias(). stream()
+                                            .map(CategoriaResponseDTO::fromEntity)
+                                            .toList() :
+                                    List.of(),
+                            servico.getDataCriacao(),
+                            EnderecoResponseDTO.fromEntity(enderecoServico),
                             arredondar(distanciaKm)
                     );
                 })

@@ -7,4 +7,6 @@ import br.edu.ifpe.recife.homey.entity.Servico;
 
 public interface ServicoRepository extends JpaRepository<Servico, Long> {
     List<Servico> findByDisponivelTrue();
+
+    List<Servico> findByCategorias_NomeIgnoreCase(String nome);
 }

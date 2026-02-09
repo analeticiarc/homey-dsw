@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifpe.recife.homey.dto.CriarClienteDTO;
 import br.edu.ifpe.recife.homey.dto.CriarPrestadorDTO;
+import br.edu.ifpe.recife.homey.dto.UsuarioResponseDTO;
+import br.edu.ifpe.recife.homey.entity.Prestador;
 import br.edu.ifpe.recife.homey.service.UsuarioService;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
@@ -38,7 +40,9 @@ public class UsuarioController {
 
     @GetMapping("/prestador/{id}")
     public ResponseEntity<?> pegarPrestador(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(usuarioService.pegarPrestador(id));
+        Prestador prestador = usuarioService.pegarPrestador(id);
+        UsuarioResponseDTO prestadorDTO = UsuarioResponseDTO.fromEntity(prestador);
+        return ResponseEntity.ok(prestadorDTO);
     }
     
 }

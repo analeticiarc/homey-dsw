@@ -16,7 +16,7 @@ public class NominatimService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Coordenada obterCoordenadas(String enderecoCompleto) {
+    private NominatimResponse buscarPrimeiroResultado(String enderecoCompleto) {
 
         String url = UriComponentsBuilder
             .fromUriString("https://nominatim.openstreetmap.org/search")
@@ -32,7 +32,6 @@ public class NominatimService {
         headers.set("Accept", "application/json");
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
-
         ResponseEntity<NominatimResponse[]> response =
             restTemplate.exchange(
                 url,
@@ -45,11 +44,19 @@ public class NominatimService {
             throw new IllegalArgumentException("Endereço não encontrado no Nominatim");
         }
 
-        NominatimResponse nominatim = response.getBody()[0];
+        return response.getBody()[0];
+    }
+
+    public Coordenada obterCoordenadas(String enderecoCompleto) {
+        NominatimResponse nominatim = buscarPrimeiroResultado(enderecoCompleto);
 
         return new Coordenada(
             Double.parseDouble(nominatim.lat()),
             Double.parseDouble(nominatim.lon())
         );
+    }
+
+    public NominatimResponse obterDetalhes(String enderecoCompleto) {
+        return buscarPrimeiroResultado(enderecoCompleto);
     }
 }
