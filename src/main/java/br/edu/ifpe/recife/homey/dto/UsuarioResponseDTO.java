@@ -19,7 +19,8 @@ public record UsuarioResponseDTO(
     String cpfCnpj,
     String resumo,
     Double avaliacao,
-    Date dataCriacao
+    Date dataCriacao,
+    EnderecoResponseDTO endereco
 ) {
     public static UsuarioResponseDTO fromEntity(Usuario usuario) {
         if (usuario instanceof Cliente cliente) {
@@ -35,7 +36,8 @@ public record UsuarioResponseDTO(
                 null,
                 null,
                 null,
-                cliente.getDataCriacao()
+                cliente.getDataCriacao(),
+                cliente.getEndereco() != null ? EnderecoResponseDTO.fromEntity(cliente.getEndereco()) : null
             );
         } else if (usuario instanceof Prestador prestador) {
             return new UsuarioResponseDTO(
@@ -50,7 +52,8 @@ public record UsuarioResponseDTO(
                 prestador.getCpf_cnpj(),
                 prestador.getResumo(),
                 prestador.getAvaliacao(),
-                prestador.getDataCriacao()
+                prestador.getDataCriacao(),
+                prestador.getEndereco() != null ? EnderecoResponseDTO.fromEntity(prestador.getEndereco()) : null
             );
         }
         return null;

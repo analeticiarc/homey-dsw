@@ -42,8 +42,20 @@ public abstract class Usuario {
     @Column(name = "DT_CRIACAO")
     protected Date dataCriacao;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_ENDERECO", referencedColumnName = "ID", nullable = true)
+    private Endereco endereco;
+
     @PrePersist
     public void setDataCriacao() {
         this.dataCriacao = new Date();
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
     }
 }

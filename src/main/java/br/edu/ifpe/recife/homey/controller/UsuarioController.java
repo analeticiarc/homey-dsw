@@ -10,6 +10,12 @@ import br.edu.ifpe.recife.homey.dto.CriarClienteDTO;
 import br.edu.ifpe.recife.homey.dto.CriarPrestadorDTO;
 import br.edu.ifpe.recife.homey.service.UsuarioService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/usuario")
@@ -29,4 +35,10 @@ public class UsuarioController {
     public ResponseEntity<?> criarCliente(@Valid @RequestBody CriarClienteDTO dto) throws Exception {
         return ResponseEntity.ok(usuarioService.criaCliente(dto));
     }
+
+    @GetMapping("/prestador/{id}")
+    public ResponseEntity<?> pegarPrestador(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(usuarioService.pegarPrestador(id));
+    }
+    
 }

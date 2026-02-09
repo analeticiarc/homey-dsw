@@ -2,6 +2,7 @@ package br.edu.ifpe.recife.homey.controller;
 
 import br.edu.ifpe.recife.homey.dto.AtualizarServicoDTO;
 import br.edu.ifpe.recife.homey.dto.CriarServicoDTO;
+import br.edu.ifpe.recife.homey.dto.ServicoProximoDTO;
 import br.edu.ifpe.recife.homey.dto.ServicoResponseDTO;
 import br.edu.ifpe.recife.homey.entity.Usuario;
 import br.edu.ifpe.recife.homey.service.ServicoService;
@@ -76,6 +77,15 @@ public class ServicoController {
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/proximos")
+    @Operation(summary = "Buscar serviços próximos", description = "Busca serviços próximos a um CEP fornecido")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public List<ServicoProximoDTO> buscarServicosPorCep(
+            @RequestParam String cep
+    ) {
+        return servicoService.buscarPorCep(cep);
     }
 
     @PutMapping("/{id}")

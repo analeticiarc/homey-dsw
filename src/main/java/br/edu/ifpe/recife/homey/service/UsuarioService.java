@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import br.edu.ifpe.recife.homey.dto.CriarClienteDTO;
 import br.edu.ifpe.recife.homey.dto.CriarPrestadorDTO;
+import br.edu.ifpe.recife.homey.dto.EnderecoDTO;
 import br.edu.ifpe.recife.homey.entity.Cliente;
+import br.edu.ifpe.recife.homey.entity.Endereco;
 import br.edu.ifpe.recife.homey.entity.Prestador;
 import br.edu.ifpe.recife.homey.repository.ClienteRepository;
 import br.edu.ifpe.recife.homey.repository.PrestadorRepository;
@@ -37,6 +39,10 @@ public class UsuarioService {
         prestador.setTelefone(dto.telefone());
         prestador.setSenha(passwordEncoder.encode(dto.senha()));
         prestador.setDataNascimento(dto.dataNascimento());
+
+        if (dto.endereco() != null) {
+            prestador.setEndereco(mapearEndereco(dto.endereco()));
+        }
         
         prestadorRepository.save(prestador);
         return prestador;
@@ -56,8 +62,30 @@ public class UsuarioService {
         cliente.setSenha(passwordEncoder.encode(dto.senha()));
         cliente.setDataNascimento(dto.dataNascimento());
 
+        if (dto.endereco() != null) {
+            cliente.setEndereco(mapearEndereco(dto.endereco()));
+        }
+
         clienteRepository.save(cliente);
 
         return cliente;
+    }
+
+    public Prestador pegarPrestador(Long id) {
+        return prestadorRepository.findById(id).orElse(null);
+    }
+
+    private Endereco mapearEndereco(EnderecoDTO dto) {
+        Endereco endereco = new Endereco();
+        endereco.setLogradouro(dto.logradouro());
+        endereco.setNumero(dto.numero());
+        endereco.setComplemento(dto.complemento());
+        endereco.setBairro(dto.bairro());
+        endereco.setCidade(dto.cidade());
+        endereco.setEstado(dto.estado());
+        endereco.setCep(dto.cep());
+        endereco.setLatitude(dto.latitude());
+        endereco.setLongitude(dto.longitude());
+        return endereco;
     }
 }
